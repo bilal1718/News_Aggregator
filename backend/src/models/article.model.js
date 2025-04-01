@@ -16,10 +16,20 @@ const Article = sequelize.define('Article', {
     allowNull: false
   },
   source: {
-    type: DataTypes.STRING  // e.g., "NewsAPI", "UserSubmitted"
+    type: DataTypes.STRING 
   },
   category: {
-    type: DataTypes.STRING  // e.g., "technology", "politics"
+    type: DataTypes.ENUM(
+      'business',
+      'entertainment',
+      'general',
+      'health',
+      'science',
+      'sports',
+      'technology'
+    ),
+    allowNull: false,
+    defaultValue: 'general'
   },
   publishedAt: {
     type: DataTypes.DATE
