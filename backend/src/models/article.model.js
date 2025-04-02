@@ -13,7 +13,7 @@ const Article = sequelize.define('Article', {
   },
   content: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   source: {
     type: DataTypes.STRING 
