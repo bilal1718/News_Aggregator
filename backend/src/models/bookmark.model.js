@@ -7,7 +7,7 @@ const Bookmark = sequelize.define('Bookmark', {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true
     },
-    userId: {  // Explicit foreign key
+    userId: { 
       type: DataTypes.UUID,
       allowNull: false,
       references: {
@@ -15,7 +15,7 @@ const Bookmark = sequelize.define('Bookmark', {
         key: 'userId'
       }
     },
-    articleId: {  // Explicit foreign key
+    articleId: {  
       type: DataTypes.UUID,
       allowNull: false,
       references: {
