@@ -3,6 +3,7 @@ const Article = require('./article.model');
 const Bookmark = require('./bookmark.model');
 const Comment = require('./comment.model');
 const Reaction = require('./reaction.model');
+const Note = require('./note.model');
 
 
 User.hasMany(Article, { foreignKey: 'authorId' });
@@ -36,11 +37,18 @@ Reaction.belongsTo(Article, { foreignKey: 'articleId', as: 'article' });
 User.hasMany(Reaction, { foreignKey: 'userId', as: 'reactions' });
 Article.hasMany(Reaction, { foreignKey: 'articleId', as: 'reactions' });
 
+Note.belongsTo(User, { foreignKey: 'userId', as: 'author' });
+Note.belongsTo(Article, { foreignKey: 'articleId', as: 'article' });
+
+User.hasMany(Note, { foreignKey: 'userId', as: 'notes' });
+Article.hasMany(Note, { foreignKey: 'articleId', as: 'notes' });
+
 
 module.exports = {
   User,
   Article,
   Bookmark,
   Comment,
-  Reaction
+  Reaction,
+  Note
 };
