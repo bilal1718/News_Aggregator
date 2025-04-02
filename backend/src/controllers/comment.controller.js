@@ -35,7 +35,7 @@ exports.addComment = async (req, res) => {
         where: { articleId },
         include: [{
           model: User,
-          as: 'commenter', // Match the alias
+          as: 'commenter', 
           attributes: ['userId', 'name']
         }],
         order: [['created_at', 'DESC']]
