@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const { initializePreferences } = require('./userPreference.controller');
+
 
 exports.register = async (req, res) => {
   try {
@@ -11,6 +13,8 @@ exports.register = async (req, res) => {
       email: user.email,
       role: user.role
     });
+    await initializePreferences(user.userId);
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
