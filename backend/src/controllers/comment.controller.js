@@ -1,4 +1,5 @@
 const { Comment, User, Article } = require('../models');
+const { createNotification } = require('./notification.controller');
 
 exports.addComment = async (req, res) => {
     try {
@@ -20,6 +21,17 @@ exports.addComment = async (req, res) => {
           attributes: ['userId', 'name']
         }]
       });
+      if (commentWithUser) {
+        await createNotification(
+          article.authorId,
+          `New comment on your article "${article.title}"`,
+          'new_comment',
+          { 
+            articleId: article.articleId,
+            commentId: comment.commentId 
+          }
+        );
+      }
   
       res.status(201).json(commentWithUser);
     } catch (error) {
