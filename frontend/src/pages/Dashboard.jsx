@@ -140,9 +140,21 @@ const Dashboard = () => {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : error ? (
+      {isLoading ? (
+  <div className="flex justify-center items-center h-80 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="flex flex-col items-center">
+      <div className="relative">
+        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </div>
+      </div>
+      <p className="text-gray-600 mt-4 font-medium">Loading your personalized news feed...</p>
+    </div>
+  </div>
+) : error ? (
           <div>Error: {error}</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -236,6 +248,7 @@ const Dashboard = () => {
           </nav>
         </div>
       </div>
+      
     </div>
   );
 };
