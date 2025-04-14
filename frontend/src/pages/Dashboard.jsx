@@ -8,6 +8,8 @@ const Dashboard = () => {
   const [articles, setArticles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bookmarkedArticleIds, setBookmarkedArticleIds] = useState(new Set());
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +64,45 @@ const Dashboard = () => {
     fetchData();
   }, [activeCategory]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const bookmarksData = await getUserBookmarks();
+        const bookmarkSet = new Set(bookmarksData.map(bookmark => bookmark.articleId));
+        setBookmarkedArticleIds(bookmarkSet);
+
+        let articlesData;
+        if (activeCategory === 'all') {
+          articlesData = await getArticles();
+        } else {
+          articlesData = await getArticlesByCategory(activeCategory);
+        }
+        setArticles(articlesData);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching dashboard data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeCategory]);
+
+  const handleBookmarkChange = (articleId, isBookmarked) => {
+    setBookmarkedArticleIds(prev => {
+      const newSet = new Set(prev);
+      if (isBookmarked) {
+        newSet.add(articleId);
+      } else {
+        newSet.delete(articleId);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <Navbar />
@@ -77,6 +118,8 @@ const Dashboard = () => {
               <ArticleCard
                 key={article.articleId}
                 article={article}
+                isBookmarked={bookmarkedArticleIds.has(article.articleId)}
+                onBookmarkChange={handleBookmarkChange}
               />
             ))}
           </div>
