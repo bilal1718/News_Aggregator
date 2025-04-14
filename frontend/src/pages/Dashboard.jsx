@@ -9,6 +9,8 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bookmarkedArticleIds, setBookmarkedArticleIds] = useState(new Set());
+  const [preferences, setPreferences] = useState(null);
+
 
 
   useEffect(() => {
@@ -102,6 +104,36 @@ const Dashboard = () => {
       return newSet;
     });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const prefsData = await getUserPreferences();
+        setPreferences(prefsData);
+  
+        const bookmarksData = await getUserBookmarks();
+        const bookmarkSet = new Set(bookmarksData.map(bookmark => bookmark.articleId));
+        setBookmarkedArticleIds(bookmarkSet);
+  
+        let articlesData;
+        if (activeCategory === 'all') {
+          articlesData = await getArticles();
+        } else {
+          articlesData = await getArticlesByCategory(activeCategory);
+        }
+        setArticles(articlesData);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching dashboard data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [activeCategory]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
