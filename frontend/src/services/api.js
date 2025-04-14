@@ -51,3 +51,21 @@ export const addComment = (articleId, content) => fetchWithAuth('/comments', {
 });
 
 export const getArticleComments = (articleId) => fetchWithAuth(`/comments/${articleId}`);
+
+export const addNote = (articleId, content) => fetchWithAuth('/notes', {
+  method: 'POST',
+  body: JSON.stringify({ articleId, content }),
+});
+
+export const getUserNotes = () => fetchWithAuth('/notes');
+
+export const deleteNote = (noteId) => fetchWithAuth(`/notes/${noteId}`, {
+  method: 'DELETE',
+});
+
+export const addReaction = (articleId, type) => fetchWithAuth('/reactions', {
+  method: 'POST',
+  body: JSON.stringify({ articleId, type }),
+});
+
+export const getArticleReactions = (articleId) => fetchWithAuth(`/reactions/${articleId}`);
