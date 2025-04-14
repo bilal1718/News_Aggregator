@@ -33,3 +33,21 @@ const fetchWithAuth = async (endpoint, options = {}) => {
 
 export const getArticles = () => fetchWithAuth('/articles');
 export const getArticlesByCategory = (category) => fetchWithAuth(`/articles/${category}`);
+
+export const addBookmark = (articleId) => fetchWithAuth('/bookmarks', {
+  method: 'POST',
+  body: JSON.stringify({ articleId }),
+});
+
+export const removeBookmark = (articleId) => fetchWithAuth(`/bookmarks/${articleId}`, {
+  method: 'DELETE',
+});
+
+export const getUserBookmarks = () => fetchWithAuth('/bookmarks');
+
+export const addComment = (articleId, content) => fetchWithAuth('/comments', {
+  method: 'POST',
+  body: JSON.stringify({ articleId, content }),
+});
+
+export const getArticleComments = (articleId) => fetchWithAuth(`/comments/${articleId}`);
