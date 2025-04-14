@@ -63,19 +63,18 @@ export const deleteNote = (noteId) => fetchWithAuth(`/notes/${noteId}`, {
   method: 'DELETE',
 });
 
+export const getNotifications = () => fetchWithAuth('/notifications');
+
+export const markNotificationAsRead = (notificationId) => fetchWithAuth(`/notifications/${notificationId}/read`, {
+  method: 'PATCH',
+});
+
 export const addReaction = (articleId, type) => fetchWithAuth('/reactions', {
   method: 'POST',
   body: JSON.stringify({ articleId, type }),
 });
 
 export const getArticleReactions = (articleId) => fetchWithAuth(`/reactions/${articleId}`);
-
-
-export const getNotifications = () => fetchWithAuth('/notifications');
-
-export const markNotificationAsRead = (notificationId) => fetchWithAuth(`/notifications/${notificationId}/read`, {
-  method: 'PATCH',
-});
 
 export const createReport = (entityType, entityId, reportType, details) => fetchWithAuth('/reports', {
   method: 'POST',
