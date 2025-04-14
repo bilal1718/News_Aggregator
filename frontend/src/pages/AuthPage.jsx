@@ -141,6 +141,17 @@ const AuthPage = () => {
   );
 };
 
-
+const TabButton = ({ active, onClick, label }) => (
+  <button
+    onClick={onClick}
+    className={`flex-1 py-2 px-4 rounded-md font-medium text-sm transition-all duration-300 ${
+      active
+        ? 'bg-blue-600 text-white shadow-md'
+        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    {label}
+  </button>
+);
 
 export default AuthPage;
