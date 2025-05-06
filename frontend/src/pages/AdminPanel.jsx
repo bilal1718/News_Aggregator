@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { getReports } from '../services/api';
+import { getReports, updateReportStatus } from '../services/api';
 
 const AdminPanel = () => {
   const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updateInProgress, setUpdateInProgress] = useState(null);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -23,6 +24,22 @@ const AdminPanel = () => {
 
     fetchReports();
   }, []);
+
+  const handleUpdateStatus = async (reportId, status) => {
+    setUpdateInProgress(reportId);
+    try {
+      const updatedReport = await updateReportStatus(reportId, status);
+      
+      setReports(reports.map(report => 
+        report.reportId === reportId ? { ...report, status: updatedReport.status } : report
+      ));
+    } catch (err) {
+      setError(err.message);
+      console.error('Error updating report status:', err);
+    } finally {
+      setUpdateInProgress(null);
+    }
+  };
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -81,9 +98,36 @@ const AdminPanel = () => {
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
                         Report #{report.reportId}
                       </h3>
-                      <span className="px-3 py-1 text-xs font-medium rounded-md">
-                        {report.status}
-                      </span>
+                      <div className="flex space-x-2">
+                        {report.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleUpdateStatus(report.reportId, 'resolved')}
+                              disabled={updateInProgress === report.reportId}
+                              className="px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                            >
+                              Resolve
+                            </button>
+                            <button
+                              onClick={() => handleUpdateStatus(report.reportId, 'rejected')}
+                              disabled={updateInProgress === report.reportId}
+                              className="px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {report.status === 'resolved' && (
+                          <span className="px-3 py-1.5 text-xs font-medium rounded-md bg-green-100 text-green-800">
+                            Resolved
+                          </span>
+                        )}
+                        {report.status === 'rejected' && (
+                          <span className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-100 text-red-800">
+                            Rejected
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="mt-2 sm:flex sm:justify-between">
