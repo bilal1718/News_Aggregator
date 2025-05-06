@@ -9,7 +9,8 @@ import {
   addReaction, 
   getArticleReactions,
   addNote,
-  getUserNotes
+  getUserNotes,
+  createReport
 } from '../services/api';
 
 const ArticleDetail = () => {
@@ -26,9 +27,17 @@ const ArticleDetail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNoteSubmitting, setIsNoteSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportData, setReportData] = useState({
+    reportType: 'inappropriate_content',
+    details: ''
+  });
+  
+  // UI state
   const [activeTab, setActiveTab] = useState('article');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarTab, setMobileSidebarTab] = useState('comments');
+  
   const commentInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -67,6 +76,7 @@ const ArticleDetail = () => {
           setExistingNote(existingNote);
           setNoteText(existingNote.content);
         }
+        
       } catch (err) {
         setError(err.message);
         console.error('Error fetching article data:', err);
@@ -77,6 +87,7 @@ const ArticleDetail = () => {
     
     fetchArticleData();
 
+    // Click outside to close sidebar on mobile
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target) && window.innerWidth < 768) {
         setSidebarOpen(false);
@@ -86,7 +97,7 @@ const ArticleDetail = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [id, currentUser]);
-
+  
   const handleAddComment = async (e) => {
     e.preventDefault();
     
@@ -103,7 +114,7 @@ const ArticleDetail = () => {
       setIsSubmitting(false);
     }
   };
-
+  
   const handleReaction = async (type) => {
     try {
       await addReaction(id, type);
@@ -127,7 +138,7 @@ const ArticleDetail = () => {
       console.error('Error adding reaction:', err);
     }
   };
-
+  
   const handleSaveNote = async () => {
     if (!noteText.trim()) return;
     
@@ -141,7 +152,16 @@ const ArticleDetail = () => {
       setIsNoteSubmitting(false);
     }
   };
-
+  
+  const handleReportSubmit = async () => {
+    try {
+      await createReport('article', id, reportData.reportType, reportData.details);
+      setShowReportModal(false);
+    } catch (err) {
+      console.error('Error reporting content:', err);
+    }
+  };
+  
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -207,6 +227,7 @@ const ArticleDetail = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
+      {/* Mobile Bottom Nav */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center h-16 z-30 md:hidden">
         <button 
           onClick={() => setActiveTab('article')}
@@ -247,14 +268,28 @@ const ArticleDetail = () => {
         </button>
       </div>
       
+      {/* Main content */}
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto mb-20 md:mb-0">
+        {/* Article section - always visible on mobile */}
         {activeTab === 'article' && (
           <div className="w-full md:w-2/3 px-4 sm:px-6 lg:px-8 py-6">
             <div className="bg-white rounded-lg shadow-md p-5 md:p-8">
-              <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full capitalize bg-blue-100 text-blue-800 mb-3">
-                {article.category}
-              </span>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{article.title}</h1>
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full capitalize bg-blue-100 text-blue-800 mb-3">
+                    {article.category}
+                  </span>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{article.title}</h1>
+                </div>
+                <button 
+                  onClick={() => setShowReportModal(true)}
+                  className="text-gray-400 hover:text-red-500 focus:outline-none"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                  </svg>
+                </button>
+              </div>
               
               <div className="flex items-center text-sm text-gray-500 mb-6">
                 <span>Source: {article.source}</span>
@@ -306,6 +341,7 @@ const ArticleDetail = () => {
           </div>
         )}
         
+        {/* Sidebar - always visible on desktop, slide-in on mobile */}
         <div
           ref={sidebarRef}
           className={`w-full md:w-1/3 bg-white md:bg-transparent fixed inset-y-0 right-0 transform ${
@@ -313,6 +349,7 @@ const ArticleDetail = () => {
           } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 md:z-0 overflow-y-auto pt-4 md:pt-6 px-0 md:px-4 pb-24`}
           style={{ maxHeight: '100vh', top: '64px' }}
         >
+          {/* Mobile sidebar header */}
           <div className="md:hidden flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 sticky top-0 z-10">
             <h2 className="text-lg font-medium text-gray-900">
               {mobileSidebarTab === 'comments' ? 'Comments' : 'Personal Notes'}
@@ -327,6 +364,7 @@ const ArticleDetail = () => {
             </button>
           </div>
           
+          {/* Desktop sidebar tabs */}
           <div className="hidden md:flex border-b border-gray-200 mb-4">
             <button
               onClick={() => setMobileSidebarTab('comments')}
@@ -347,6 +385,7 @@ const ArticleDetail = () => {
           </div>
           
           <div className="px-4 md:px-0">
+            {/* Comments content */}
             {mobileSidebarTab === 'comments' && (
               <div className="bg-white rounded-lg shadow-md md:shadow p-4">
                 <form onSubmit={handleAddComment} className="mb-6">
@@ -403,6 +442,7 @@ const ArticleDetail = () => {
               </div>
             )}
             
+            {/* Notes content */}
             {mobileSidebarTab === 'notes' && (
               <div className="bg-white rounded-lg shadow-md md:shadow p-4">
                 <div className="mb-4">
@@ -411,7 +451,7 @@ const ArticleDetail = () => {
                     onChange={(e) => setNoteText(e.target.value)}
                     placeholder="Add your personal notes about this article..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                   шу rows="8"
+                    rows="8"
                   ></textarea>
                 </div>
                 
@@ -437,6 +477,63 @@ const ArticleDetail = () => {
           </div>
         </div>
       </div>
+      
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Report Content</h3>
+            </div>
+            
+            <div className="px-6 py-4">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Report Type
+                </label>
+                <select
+                  value={reportData.reportType}
+                  onChange={(e) => setReportData({ ...reportData, reportType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="inappropriate_content">Inappropriate Content</option>
+                  <option value="misinformation">Misinformation</option>
+                  <option value="copyright_violation">Copyright Violation</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Details
+                </label>
+                <textarea
+                  value={reportData.details}
+                  onChange={(e) => setReportData({ ...reportData, details: e.target.value })}
+                  placeholder="Please provide details about your report..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+            
+            <div className="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowReportModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReportSubmit}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Submit Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
