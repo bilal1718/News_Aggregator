@@ -8,6 +8,7 @@ const NotesPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteInProgress, setDeleteInProgress] = useState(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(null);
 
   const fetchNotes = async () => {
     setIsLoading(true);
@@ -40,6 +41,7 @@ const NotesPage = () => {
       console.error('Error deleting note:', err);
     } finally {
       setDeleteInProgress(null);
+      setShowConfirmDialog(null);
     }
   };
 
@@ -127,7 +129,7 @@ const NotesPage = () => {
                             {formatDate(note.createdAt)}
                           </p>
                           <button 
-                            onClick={() => handleDeleteNote(note.noteId)}
+                            onClick={() => setShowConfirmDialog(note.noteId)}
                             disabled={deleteInProgress === note.noteId}
                             className="ml-4 text-red-500 hover:text-red-700 focus:outline-none"
                           >
@@ -152,6 +154,31 @@ const NotesPage = () => {
           </div>
         )}
       </div>
+
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900">Delete Note</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to delete this note? This action cannot be undone.
+            </p>
+            <div className="mt-4 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowConfirmDialog(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteNote(showConfirmDialog)}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
