@@ -27,8 +27,12 @@ exports.addBookmark = async (req, res) => {
 
     res.status(201).json(bookmark);
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ error: 'Already bookmarked' });
+    }
+    return res.status(500).json({ error: error.message });
+
+    }
 };
 
 exports.removeBookmark = async (req, res) => {
