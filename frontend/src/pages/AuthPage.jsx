@@ -15,7 +15,12 @@ const AuthPage = () => {
   }, []);
 
   if (currentUser) {
-    return <Navigate to="/dashboard" />;
+    console.log('Current User: ',currentUser)
+    if (currentUser.role === 'admin') {
+      return <Navigate to="/admin" />;
+    } else {
+      return <Navigate to="/dashboard" />;
+    }
   }
 
   return (
