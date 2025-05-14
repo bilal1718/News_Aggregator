@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getUserNotes, deleteNote } from '../services/api';
+import Footer from '../components/Footer';
+import AIChatbot from '../components/AI_Chatbot';
 
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
@@ -39,7 +41,15 @@ const NotesPage = () => {
   };
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    console.log('Date:', dateString);
+    
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return now.toLocaleDateString(undefined, options);
+    }
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -141,6 +151,10 @@ const NotesPage = () => {
           </div>
         )}
       </div>
+      <Footer/>
+
+     <AIChatbot darkMode={false}/>
+
     </div>
   );
 };
