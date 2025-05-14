@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import ArticleCard from '../components/ArticleCard';
 import { getUserBookmarks } from '../services/api';
+import Footer from '../components/Footer';
+import AIChatbot from '../components/AI_Chatbot';
 
 const BookmarksPage = () => {
   const [bookmarks, setBookmarks] = useState([]);
@@ -88,7 +90,11 @@ const BookmarksPage = () => {
             ))}
           </div>
         )}
-      </div>
+      
+    </div>
+    <Footer/>
+
+    <AIChatbot darkMode={false}/>
     </div>
   );
 };
