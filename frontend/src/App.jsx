@@ -10,6 +10,7 @@ import UserPreferences from './pages/UserPreferences';
 import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from '../src/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import Recommendations from './pages/Recommendations';
 
 const App = () => {
   return (
@@ -21,6 +22,12 @@ const App = () => {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/recommendations" element={
+            <ProtectedRoute>
+              <Recommendations/>
             </ProtectedRoute>
           } />
           
