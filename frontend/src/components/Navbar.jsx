@@ -12,22 +12,22 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const admin = isAdmin();
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const data = await getNotifications();
-        setNotifications(data);
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchNotifications = async () => {
+  //     try {
+  //       const data = await getNotifications();
+  //       setNotifications(data);
+  //     } catch (error) {
+  //       console.error('Failed to fetch notifications:', error);
+  //     }
+  //   };
 
-    fetchNotifications();
-    // Set up a polling mechanism to check for new notifications
-    const interval = setInterval(fetchNotifications, 60000); // Check every minute
+  //   fetchNotifications();
+  //   // Set up a polling mechanism to check for new notifications
+  //   const interval = setInterval(fetchNotifications, 60000); // Check every minute
     
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
   
   const unreadCount = notifications.filter(notification => !notification.readStatus).length;
 
@@ -53,6 +53,17 @@ const Navbar = () => {
                 } transition-all duration-200 inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium`}
               >
                 Dashboard
+              </Link>
+              
+              <Link
+                to="/recommendations"
+                className={`${
+                  location.pathname === '/recommendations' 
+                    ? 'border-blue-400 text-white' 
+                    : 'border-transparent text-gray-300 hover:border-gray-400 hover:text-white'
+                } transition-all duration-200 inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium`}
+              >
+                Recommendations
               </Link>
               
               <Link
@@ -198,7 +209,7 @@ const Navbar = () => {
                   {currentUser?.name?.charAt(0) || 'U'}
                 </div>
                 <span className="text-sm font-medium text-gray-300">
-                  {currentUser?.name || `User`}
+                  {currentUser?.role || `User`}
                 </span>
               </div>
               <button
@@ -225,6 +236,18 @@ const Navbar = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Dashboard
+            </Link>
+            
+            <Link
+              to="/recommendations"
+              className={`${
+                location.pathname === '/recommendations' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              } transition-all duration-150 block px-3 py-2 rounded-md text-base font-medium`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Recommendations
             </Link>
             
             <Link
@@ -285,7 +308,7 @@ const Navbar = () => {
                   {currentUser?.name?.charAt(0) || 'U'}
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium leading-none text-white">{currentUser?.name || `User`}</div>
+                  <div className="text-base font-medium leading-none text-white">{currentUser?.role || `User`}</div>
                   <div className="text-sm font-medium leading-none text-gray-400 mt-1">{currentUser?.email || ''}</div>
                 </div>
               </div>
